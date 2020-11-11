@@ -31,9 +31,11 @@ def Levit(graph,s = 0):
     M = set()
     M1_main = Queue()
     M1_urgent = Queue()
+    M1 = set([M1_main,M1_urgent])
     M2 = set()
     # помещаем заданную вершину в срочную очередь
     M1_urgent.put(s)
+    M1.add(s)
     # помещаем все остальные вершины в множество M2
     for node in graph.nodes:
         if node != s:
@@ -42,14 +44,25 @@ def Levit(graph,s = 0):
     d = [None] * len(graph.nodes) - 1
     d[s] = 0
     list_of_edges = list(graph.edges)
-    while not M2:
+    while not M1_main and M1_urgent:
         if not M1_urgent:
             u = M1_urgent.get()
         else: 
             u = M1_main.get()
-        
-
-
+        # Получаем вершины, соединенные с текущим ребром
+        le = filter(lambda x: x[0] == u,list_of_edges)
+        for i in len(le):
+            for v in le[i][1]:
+                if v in M2:
+                    M1_main.put(v)
+                    d[v] = d[u] + graph[u][v]
+                elif v in M1:
+                    d[v] = min(d[v],d[u] + graph[u][v])
+                elif v in M:
+                    if d[v] > d[u] + graph[u][v]:
+                        d[v] = d[u] + graph[u][v]
+                        M1.add(v)
+    return d
 
     
 
