@@ -14,10 +14,11 @@ def graph_generator(num_of_nodes = 5,num_of_edge = 6):
         iter = 0
         # создаем пустой граф
         graph = DiGraph()
+        graph.add_nodes_from(nodes)
         while iter < num_of_edge:
             start = random.choice(nodes)
             end = random.choice(nodes)
-            if (start,end) in graph:
+            if ((start,end) in graph) or (start == end):
                 continue
             else:
                 weight = random.choice(range(1,10))            
@@ -31,7 +32,7 @@ def Levit(graph,s = 0):
     M = set()
     M1_main = Queue()
     M1_urgent = Queue()
-    M1 = set([M1_main,M1_urgent])
+    M1 = set()
     M2 = set()
     # помещаем заданную вершину в срочную очередь
     M1_urgent.put(s)
@@ -41,33 +42,57 @@ def Levit(graph,s = 0):
         if node != s:
             M2.add(node)
     # создаем список кратчайших путей от заданной вершины до остальных
-    d = [None] * len(graph.nodes) - 1
+    d = [float('inf')] * (len(graph.nodes))
     d[s] = 0
     list_of_edges = list(graph.edges)
-    while not M1_main and M1_urgent:
-        if not M1_urgent:
+    #while M1_main.empty() or M1_urgent.empty():
+    while len(M1) != 0:
+        if not M1_urgent.empty():
             u = M1_urgent.get()
+            M1.remove(u)
         else: 
             u = M1_main.get()
+            M1.remove(u)
         # Получаем вершины, соединенные с текущим ребром
-        le = filter(lambda x: x[0] == u,list_of_edges)
-        for i in len(le):
-            for v in le[i][1]:
+        le = list(filter(lambda x: x[0] == u,list_of_edges))
+        if not le:
+            M.add(u)
+            if len(M2) != 0:
+                next_node = list(M2)[0]
+                M1_main.put(next_node)
+                M1.add(next_node)
+                M2.remove(next_node)
+            else:
+                break
+        k = []
+        for i in range(len(le)):
+            k.append(le[i][1])
+        for i in range(len(le)):    
+            for v in k:
                 if v in M2:
+                    M2.remove(v)
                     M1_main.put(v)
-                    d[v] = d[u] + graph[u][v]
+                    M1.add(v)
+                    d[v] = d[u] + graph[u][v]['weight']
                 elif v in M1:
-                    d[v] = min(d[v],d[u] + graph[u][v])
+                    d[v] = min(d[v],d[u] + graph[u][v]['weight'])
                 elif v in M:
-                    if d[v] > d[u] + graph[u][v]:
-                        d[v] = d[u] + graph[u][v]
+                    if d[v] > d[u] + graph[u][v]['weight']:
+                        d[v] = d[u] + graph[u][v]['weight']
+                        M1_urgent.put(v)
                         M1.add(v)
+                        M.remove(v)
+        M.add(u)
+    for i in range(len(d)):
+        if d[i] == float('inf'):
+            d[i] = 0
     return d
 
     
 
 if __name__ == "__main__":
     g = graph_generator()
-    l = list(g.edges)[0]
-    print(l)
-    print(l[0])
+    print('Edges:',g.edges)
+    p = Levit(g,0)
+    print(p)    
+
