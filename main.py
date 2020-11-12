@@ -94,5 +94,7 @@ if __name__ == "__main__":
     g = graph_generator()
     print('Edges:',g.edges)
     p = Levit(g,0)
-    print(p)    
-
+    print("Result sizes of ways:",p)    
+    print("Weights of edges:")
+    for i in g.edges:
+        print(i,g[i[0]][i[1]]['weight'])
