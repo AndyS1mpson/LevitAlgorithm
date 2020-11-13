@@ -3,6 +3,7 @@ import numpy as np
 from networkx import DiGraph
 import random
 from queue import Queue
+import time
 
 def graph_generator(num_of_nodes = 5,num_of_edge = 6):
     if num_of_edge < num_of_nodes:
@@ -91,10 +92,16 @@ def Levit(graph,s = 0):
     
 
 if __name__ == "__main__":
-    g = graph_generator()
-    print('Edges:',g.edges)
-    p = Levit(g,0)
-    print("Result sizes of ways:",p)    
-    print("Weights of edges:")
-    for i in g.edges:
-        print(i,g[i[0]][i[1]]['weight'])
+    N = [100,200,300,400,500,600,700,800,900,1000]
+    M = [200,400,600,800,1000,1200,1400,1600,1800,2000]
+    for i in range(len(N)):
+        g = graph_generator(N[i],M[i])
+    #print('Edges:',g.edges)
+        startTime = time.time()
+        p = Levit(g,0)
+        endTime = time.time()
+    #print("Result sizes of ways:",p)    
+    #print("Weights of edges:")
+    #for i in g.edges:
+    #    print(i,g[i[0]][i[1]]['weight'])
+        print("Время работы:",endTime - startTime,"seconds")
